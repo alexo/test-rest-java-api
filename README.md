@@ -14,7 +14,7 @@ A minimal Spring Boot REST API for testing deployments across various cloud plat
 
 ### Prerequisites
 
-- Java 17+
+- Java 26+ (Spring Boot 4.0)
 - Maven 3.9+ (or Docker)
 
 ### Option 1: Maven

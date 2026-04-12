@@ -20,4 +20,14 @@ public class HelloController {
     public Map<String, String> helloName(@PathVariable String name) {
         return Map.of("message", "Hello, " + name + "!");
     }
+
+    @GetMapping("/thread")
+    public Map<String, Object> threadInfo() {
+        Thread t = Thread.currentThread();
+        return Map.of(
+            "name", t.getName(),
+            "virtual", t.isVirtual(),
+            "id", t.threadId()
+        );
+    }
 }
