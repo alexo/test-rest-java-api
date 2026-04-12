@@ -25,11 +25,13 @@ WORKDIR /app
 COPY --from=jre-builder /custom-jre /opt/jre
 COPY --from=builder /app/target/*.jar app.jar
 ENV PATH="/opt/jre/bin:$PATH"
+
 EXPOSE 8080
 ENTRYPOINT ["java", \
   "-XX:+UseContainerSupport", \
   "-XX:MaxRAMPercentage=75.0", \
   "-XX:InitialRAMPercentage=50.0", \
+  "-XX:MaxMetaspaceSize=96m", \
   "-XX:+UseSerialGC", \
   "-Djava.security.egd=file:/dev/./urandom", \
   "-jar", "app.jar"]

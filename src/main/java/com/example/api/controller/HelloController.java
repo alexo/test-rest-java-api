@@ -30,4 +30,9 @@ public class HelloController {
             "id", t.threadId()
         );
     }
+
+    @GetMapping("/health")
+    public Map<String, String> health() {
+        return Map.of("status", "UP");
+    }
 }
