@@ -66,13 +66,76 @@ The app is packaged as a Docker image (multi-stage build, JRE-only final image) 
 | **Oracle Cloud** | 2 ARM VMs, 24GB RAM total | Most generous always-free tier |
 | **Google Cloud Run** | 2M requests/month | Scales to zero |
 | **Azure Container Apps** | 180k vCPU-seconds/month | Already have account |
-| **Koyeb** | 1 nano service, 512MB RAM | No spin-down on free tier |
+| **Koyeb** | Starter plan from $0/month | No spin-down, but requires credit card |
+| **Hetzner Cloud** | No free tier | From €3.29/month — IaaS, full VM control |
 
 ## Active Deployments
 
 | Platform | URL | Status |
 |----------|-----|--------|
 | **Railway** | https://test-rest-java-api-production.up.railway.app | Active |
+| **Render** | https://test-rest-java-api.onrender.com | Active (spins down after 15min) |
+
+## Koyeb
+
+**Status:** Skipped — credit card required even for the free tier.
+
+Koyeb's Starter plan advertises $0/month for 1 nano instance (512MB RAM, 0.1 vCPU) with no spin-down, but account creation requires a valid credit card upfront. Pricing beyond the free nano instance:
+
+| Resource | Rate |
+|----------|------|
+| Nano instance (512MB RAM, 0.1 vCPU) | Free (1 included) |
+| Additional instances | From $5.61/month |
+| Egress | $0.04 / GB (first 100GB free) |
+
+The always-on free tier would make it an attractive option, but the credit card requirement is a barrier for a test/learn project.
+
+---
+
+## Hetzner Cloud
+
+**Status:** Not attempted — no free tier, IaaS model requires more setup.
+
+Hetzner is a German cloud provider offering bare-metal performance at very low prices. Unlike the PaaS platforms in this list, Hetzner provides raw VMs — you manage the OS, Docker, networking, and deployment pipeline yourself.
+
+### Why consider it
+
+- **Best price/performance ratio** among paid options
+- **No artificial limits** — full VM with dedicated resources, no spin-down, no credit caps
+- **EU-based** (Germany, Finland) — good for GDPR-sensitive workloads
+- **One VM can host multiple services** — cost-effective if running several apps
+
+### Instance types relevant for this app
+
+| Instance | vCPU | RAM | Storage | Traffic | Price |
+|----------|------|-----|---------|---------|-------|
+| CAX11 (ARM) | 2 | 4 GB | 40 GB SSD | 20 TB | ~€3.29/month |
+| CX22 (AMD) | 2 | 4 GB | 40 GB SSD | 20 TB | ~€3.79/month |
+| CX11 (AMD) | 1 | 2 GB | 20 GB SSD | 20 TB | ~€3.29/month |
+
+### Setup complexity
+
+Significantly higher than PaaS options:
+1. Create a Hetzner account and provision a VM
+2. SSH into the VM, install Docker
+3. Set up a reverse proxy (nginx/Caddy) for HTTPS
+4. Configure firewall rules
+5. Set up deployment — either manual (`docker pull` + `docker run`) or via GitHub Actions over SSH
+
+No auto-deploy out of the box. A GitHub Actions workflow pushing over SSH would be needed for CI/CD.
+
+### Cost analysis
+
+For this app running 24/7 on a CAX11 (smallest ARM instance):
+- **~€3.29/month** (~$3.50) flat rate — no surprises, no usage-based billing
+- VM can host multiple services simultaneously, reducing effective per-service cost
+- Cheapest option if running more than one backend service
+
+### Verdict
+
+Not suitable as a quick free-tier experiment, but the best value paid option if you need always-on reliability without per-usage billing surprises. Worth considering when graduating from free-tier testing to a stable low-cost hosting setup.
+
+---
 
 ## Railway Deployment
 
@@ -123,3 +186,50 @@ Railway charges based on actual resource usage (RAM + CPU per minute).
 **Free trial:** $5 one-time credit (no card required), covering roughly 1–2 weeks of continuous running.
 
 **Cost-saving tip:** Delete the service when not actively testing. With GitHub auto-deploy, redeployment takes ~2–3 minutes on the next push.
+
+---
+
+## Render Deployment
+
+**Live URL:** https://test-rest-java-api.onrender.com
+
+### Setup
+
+Deployed via Render dashboard connecting directly to the GitHub repository. Render detects the `Dockerfile` automatically and builds/runs the image on every push to `main`. First build took longer than expected due to network configuration on Render's end.
+
+### Operations
+
+**Deploy / Redeploy**
+- Push to `main` branch — Render auto-deploys on every commit
+- Or trigger manually from the Render dashboard: service → Manual Deploy → Deploy latest commit
+
+**Stop the service**
+- Dashboard → service → Settings → **Suspend Service** — stops the service without deleting it
+- Or **Delete Service** for full removal
+
+**Restart after suspending**
+- Dashboard → service → **Resume Service**
+
+**Check logs**
+- Dashboard → service → **Logs** tab (live streaming)
+
+### Behaviour
+
+- **Spin-down:** The free tier spins down after **15 minutes of inactivity**
+- **Cold start:** ~30 seconds for the first request after spin-down (JVM startup + Spring Boot init)
+- **Auto-sleep:** Cannot be disabled on the free tier
+
+### Cost Analysis
+
+| Plan | Price | Notes |
+|------|-------|-------|
+| Free | $0 | 512MB RAM, 0.1 CPU, spins down after 15min inactivity |
+| Starter | $7/month | 512MB RAM, always-on |
+| Standard | $25/month | 2GB RAM, always-on |
+
+**Free tier limits:**
+- 750 hours/month of active runtime (enough for one always-on service, but free tier spins down anyway)
+- Builds limited to 500 minutes/month
+- No custom domains on free tier (only `.onrender.com` subdomain)
+
+**Verdict:** Free tier is suitable for testing and low-traffic APIs where cold starts are acceptable. Upgrade to Starter ($7/month) for always-on without spin-down.
