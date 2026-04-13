@@ -75,7 +75,7 @@ The app is packaged as a Docker image (multi-stage build, JRE-only final image) 
 | Platform | URL | Status |
 |----------|-----|--------|
 | **Railway** | https://test-rest-java-api-production.up.railway.app | Active |
-| **Render** | https://test-rest-java-api.onrender.com | Active (spins down after 15min) |
+| **Render** | https://test-rest-java-api-latest.onrender.com | Active (spins down after 15min, deploys via GHCR) |
 
 ## Koyeb
 
@@ -192,11 +192,13 @@ Railway charges based on actual resource usage (RAM + CPU per minute).
 
 ## Render Deployment
 
-**Live URL:** https://test-rest-java-api.onrender.com
+**Live URL:** https://test-rest-java-api-latest.onrender.com
 
 ### Setup
 
-Deployed via Render dashboard connecting directly to the GitHub repository. Render detects the `Dockerfile` automatically and builds/runs the image on every push to `main`. First build took longer than expected due to network configuration on Render's end.
+Deployed via Render dashboard using a pre-built Docker image from GitHub Container Registry (GHCR). A GitHub Actions workflow (`.github/workflows/deploy-render.yml`) builds the image on every push to `main`, pushes it to `ghcr.io/alexo/test-rest-java-api:latest`, then triggers a Render redeploy via a deploy hook.
+
+This avoids building on Render's free tier, which has limited compute and can be slow or time out for Maven + Docker builds.
 
 ### Operations
 
