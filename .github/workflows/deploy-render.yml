@@ -10,6 +10,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+    env:
+      RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
 
     steps:
       - name: Checkout
@@ -47,5 +49,5 @@ jobs:
             GIT_COMMIT=${{ github.sha }}
 
       - name: Trigger Render deploy
-        if: ${{ secrets.RENDER_DEPLOY_HOOK_URL != '' }}
-        run: curl -fsSL -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+        if: env.RENDER_DEPLOY_HOOK_URL != ''
+        run: curl -fsSL -X POST "${{ env.RENDER_DEPLOY_HOOK_URL }}"
