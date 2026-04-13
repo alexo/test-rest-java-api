@@ -8,7 +8,8 @@ A minimal Spring Boot REST API for testing deployments across various cloud plat
 |--------|------|-------------|
 | GET | `/api/hello` | Returns a hello world message |
 | GET | `/api/hello/{name}` | Returns a personalized greeting |
-| GET | `/actuator/health` | Spring health check |
+| GET | `/api/health` | Health check |
+| GET | `/api/info` | Build info (timestamp and git commit) |
 
 ## Running Locally
 
@@ -44,7 +45,7 @@ The API will be available at `http://localhost:8080`.
 ```bash
 curl http://localhost:8080/api/hello
 curl http://localhost:8080/api/hello/Alex
-curl http://localhost:8080/actuator/health
+curl http://localhost:8080/api/health
 ```
 
 ## Deployment Targets

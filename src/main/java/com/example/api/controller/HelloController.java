@@ -35,4 +35,12 @@ public class HelloController {
     public Map<String, String> health() {
         return Map.of("status", "UP");
     }
+
+    @GetMapping("/info")
+    public Map<String, String> info() {
+        return Map.of(
+            "buildTime", System.getenv().getOrDefault("BUILD_TIME", "unknown"),
+            "gitCommit", System.getenv().getOrDefault("GIT_COMMIT", "unknown")
+        );
+    }
 }

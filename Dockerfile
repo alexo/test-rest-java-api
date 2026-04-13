@@ -25,6 +25,10 @@ WORKDIR /app
 COPY --from=jre-builder /custom-jre /opt/jre
 COPY --from=builder /app/target/*.jar app.jar
 ENV PATH="/opt/jre/bin:$PATH"
+ARG BUILD_TIME=unknown
+ARG GIT_COMMIT=unknown
+ENV BUILD_TIME=${BUILD_TIME}
+ENV GIT_COMMIT=${GIT_COMMIT}
 
 EXPOSE 8080
 ENTRYPOINT ["java", \
