@@ -70,4 +70,56 @@ The app is packaged as a Docker image (multi-stage build, JRE-only final image) 
 
 ## Active Deployments
 
-_(To be updated as platforms are deployed)_
+| Platform | URL | Status |
+|----------|-----|--------|
+| **Railway** | https://test-rest-java-api-production.up.railway.app | Active |
+
+## Railway Deployment
+
+**Live URL:** https://test-rest-java-api-production.up.railway.app
+
+### Setup
+
+Deployed via Railway dashboard connecting directly to the GitHub repository. Railway detects the `Dockerfile` automatically and builds/runs the image on every push to `main`.
+
+### Operations
+
+**Deploy / Redeploy**
+- Push to `main` branch — Railway auto-deploys on every commit
+- Or trigger manually from the Railway dashboard: service → Deployments → Redeploy
+
+**Stop the service**
+- Dashboard → service → Settings → Danger zone → **Delete service**
+- Alternatively, use the Railway CLI: `railway down` (removes the deployment but keeps config)
+
+**Restart after stopping**
+- If deleted: recreate the service in the dashboard and reconnect to the GitHub repo
+- If using CLI: `railway up` to redeploy from local, or push a new commit to trigger auto-deploy
+
+**Check logs**
+- Dashboard → service → Deployments → click the active deployment → Logs
+- Or via CLI: `railway logs`
+
+### Cost Analysis
+
+Railway charges based on actual resource usage (RAM + CPU per minute).
+
+| Resource | Rate |
+|----------|------|
+| RAM | $0.000231 / GB / minute |
+| CPU | $0.000463 / vCPU / minute |
+| Egress | $0.10 / GB |
+
+**Estimated monthly cost for this app (24/7):**
+
+| Scenario | RAM usage | Estimated cost |
+|----------|-----------|----------------|
+| Idle / low traffic | ~150 MB | ~$1.50/month |
+| Moderate traffic | ~200 MB | ~$2.00/month |
+| 512 MB allocated | 512 MB | ~$5.00/month |
+
+**Railway Hobby plan** costs $5/month and includes $5 in usage credits — so the app can run continuously and stay within the included credits depending on actual allocation.
+
+**Free trial:** $5 one-time credit (no card required), covering roughly 1–2 weeks of continuous running.
+
+**Cost-saving tip:** Delete the service when not actively testing. With GitHub auto-deploy, redeployment takes ~2–3 minutes on the next push.
