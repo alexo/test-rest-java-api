@@ -236,3 +236,15 @@ This avoids building on Render's free tier, which has limited compute and can be
 - No custom domains on free tier (only `.onrender.com` subdomain)
 
 **Verdict:** Free tier is suitable for testing and low-traffic APIs where cold starts are acceptable. Upgrade to Starter ($7/month) for always-on without spin-down.
+
+### Preventing spin-down with UptimeRobot
+
+To keep the app warm and avoid cold starts, configure [UptimeRobot](https://uptimerobot.com) to ping the health endpoint every 5 minutes:
+
+- **Monitor type:** HTTP(s)
+- **URL:** `https://test-rest-java-api-latest.onrender.com/api/health`
+- **Interval:** 5 minutes (free tier minimum)
+
+UptimeRobot's free tier supports 50 monitors and is more reliable than a GitHub Actions cron for frequent polling — scheduled workflows can be delayed by up to an hour and get disabled after 60 days of repo inactivity.
+
+Note: keeping the app always-on consumes Render's 750 free hours/month. This is sufficient for a single service running continuously.
